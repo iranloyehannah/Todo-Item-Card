@@ -12,6 +12,7 @@
   --accent-cool: #ffffff;
   --danger: #ff8b6b;
   --success: #8af5a1;
+  --progress: #7dc9ff;
 }
 
 * {
@@ -57,8 +58,15 @@ body::after {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
+}
+
+button,
+select {
+  cursor: pointer;
 }
 
 #root {
@@ -80,7 +88,8 @@ input {
 
 .eyebrow,
 .micro-label,
-.meta-label {
+.meta-label,
+.field-label {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.16em;
@@ -107,8 +116,9 @@ input {
   overflow: hidden;
   width: min(100%, 56rem);
   max-width: 56rem;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 1.6rem;
   border: 1px solid var(--panel-border);
+  border-left-width: 6px;
   border-radius: 1.75rem;
   background:
     linear-gradient(180deg, rgba(31, 31, 31, 0.96), var(--panel)),
@@ -118,6 +128,33 @@ input {
     inset 0 1px 0 rgba(255, 213, 74, 0.08);
   backdrop-filter: blur(24px);
   animation: card-rise 700ms ease-out both;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.todo-card.state-calm {
+  border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+.todo-card.state-progress {
+  border-left-color: rgba(125, 201, 255, 0.85);
+}
+
+.todo-card.state-done {
+  border-left-color: rgba(138, 245, 161, 0.8);
+}
+
+.todo-card.state-alert,
+.todo-card.is-overdue {
+  border-left-color: rgba(255, 139, 107, 0.9);
+}
+
+.todo-card.is-complete {
+  background:
+    linear-gradient(180deg, rgba(24, 24, 24, 0.96), rgba(16, 16, 16, 0.92)),
+    linear-gradient(135deg, rgba(138, 245, 161, 0.08), rgba(255, 255, 255, 0.03));
 }
 
 .card-glow {
@@ -130,31 +167,52 @@ input {
   pointer-events: none;
 }
 
-.card-header,
-.card-footer,
-.card-meta {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+.priority-indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+.priority-high {
+  background: #ffd54a;
+}
+
+.priority-medium {
+  background: #f2f0d5;
+}
+
+.priority-low {
+  background: #8af5a1;
 }
 
 .card-header,
-.card-footer {
-  justify-content: space-between;
+.card-meta,
+.card-footer,
+.card-controls {
+  display: flex;
+  gap: 1rem;
 }
 
 .card-header {
   align-items: flex-start;
+  justify-content: space-between;
 }
 
 .title-block {
   flex: 1;
+  min-width: 0;
 }
 
 .todo-title {
   margin: 0.3rem 0 0;
   font-size: clamp(1.45rem, 4vw, 2.35rem);
-  max-width: 20ch;
+  line-height: 1.08;
+  max-width: 22ch;
+  overflow-wrap: anywhere;
   transition: color 180ms ease, opacity 180ms ease, text-decoration-color 180ms ease;
 }
 
@@ -165,29 +223,12 @@ input {
   text-decoration-color: rgba(121, 242, 176, 0.85);
 }
 
-.card-description {
-  margin: 1.25rem 0 1.5rem;
-  max-width: 58ch;
-  color: var(--text-soft);
-  font-size: 1rem;
-}
-
-.card-meta {
+.header-actions,
+.button-row,
+.tag-list,
+.card-controls {
+  align-items: center;
   flex-wrap: wrap;
-  padding: 1rem 0 1.4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.meta-block {
-  min-width: 12rem;
-}
-
-.meta-value {
-  display: inline-block;
-  margin-top: 0.45rem;
-  font-size: 1.02rem;
-  font-weight: 600;
 }
 
 .header-actions,
@@ -195,13 +236,18 @@ input {
 .tag-list {
   display: flex;
   gap: 0.75rem;
-  align-items: center;
-  flex-wrap: wrap;
+}
+
+.card-controls {
+  display: flex;
+  justify-content: flex-start;
+  margin: 1.25rem 0 0.85rem;
 }
 
 .badge,
 .tag-chip,
-.ghost-button {
+.ghost-button,
+.control-input {
   border-radius: 999px;
   border: 1px solid transparent;
 }
@@ -227,9 +273,9 @@ input {
 }
 
 .badge-low {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
-  color: #f3efdb;
+  background: rgba(138, 245, 161, 0.1);
+  border-color: rgba(138, 245, 161, 0.22);
+  color: #d7ffe0;
 }
 
 .badge-status-done {
@@ -244,60 +290,16 @@ input {
   color: #ffd8ce;
 }
 
-.badge-status-warning {
-  background: rgba(255, 213, 74, 0.16);
-  border-color: rgba(255, 213, 74, 0.4);
-  color: #fff0b8;
+.badge-status-progress {
+  background: rgba(125, 201, 255, 0.16);
+  border-color: rgba(125, 201, 255, 0.34);
+  color: #def3ff;
 }
 
 .badge-status-calm {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
   color: #fffdf5;
-}
-
-.tag-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.tag-chip {
-  padding: 0.5rem 0.85rem;
-  background: rgba(255, 213, 74, 0.08);
-  border-color: rgba(255, 213, 74, 0.14);
-  color: #fff2bb;
-}
-
-.ghost-button {
-  min-height: 2.7rem;
-  padding: 0.6rem 1rem;
-  border-color: rgba(255, 213, 74, 0.18);
-  background: rgba(255, 213, 74, 0.06);
-  color: #fff2bb;
-  cursor: pointer;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
-}
-
-.ghost-button:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 213, 74, 0.34);
-  background: rgba(255, 213, 74, 0.12);
-}
-
-.ghost-button:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.95);
-  outline-offset: 3px;
-  border-color: rgba(255, 255, 255, 0.42);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.ghost-button-danger:hover {
-  border-color: rgba(255, 139, 107, 0.4);
-  background: rgba(255, 139, 107, 0.12);
 }
 
 .checkbox-wrap {
@@ -307,6 +309,7 @@ input {
   width: 3rem;
   height: 3rem;
   margin-top: 0.12rem;
+  flex-shrink: 0;
 }
 
 .checkbox-wrap input {
@@ -364,6 +367,158 @@ input {
   border-bottom-color: #111111;
 }
 
+.field-shell {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.compact-field {
+  min-width: 10rem;
+}
+
+.control-input {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.7rem 0.95rem;
+  color: #fffdf5;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+select.control-input {
+  appearance: none;
+  padding-right: 2.9rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3 5.25L7 9.25L11 5.25' stroke='%23fffdf5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 0.875rem;
+}
+
+.control-textarea {
+  min-height: 8rem;
+  border-radius: 1.15rem;
+  resize: vertical;
+}
+
+.control-input:focus-visible,
+.ghost-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.95);
+  outline-offset: 3px;
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+.ghost-button {
+  min-height: 2.7rem;
+  padding: 0.6rem 1rem;
+  border-color: rgba(255, 213, 74, 0.18);
+  background: rgba(255, 213, 74, 0.06);
+  color: #fff2bb;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.ghost-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 213, 74, 0.34);
+  background: rgba(255, 213, 74, 0.12);
+}
+
+.ghost-button-danger:hover {
+  border-color: rgba(255, 139, 107, 0.4);
+  background: rgba(255, 139, 107, 0.12);
+}
+
+.collapsible-section {
+  overflow: hidden;
+  transition: max-height 220ms ease, opacity 220ms ease;
+}
+
+.collapsible-section.is-open {
+  max-height: 24rem;
+  opacity: 1;
+}
+
+.collapsible-section.is-collapsed {
+  max-height: 4.75rem;
+  opacity: 0.92;
+  mask-image: linear-gradient(180deg, black 55%, transparent 100%);
+}
+
+.card-description {
+  margin: 0 0 1.4rem;
+  max-width: 64ch;
+  color: var(--text-soft);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.card-meta {
+  flex-wrap: wrap;
+  padding: 1rem 0 1.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.meta-block {
+  min-width: 12rem;
+}
+
+.meta-value {
+  display: inline-block;
+  margin-top: 0.45rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.overdue-indicator {
+  color: rgba(255, 253, 245, 0.68);
+}
+
+.overdue-indicator.is-active {
+  color: #ffb29a;
+}
+
+.card-footer {
+  justify-content: space-between;
+  padding-top: 1.2rem;
+}
+
+.tag-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag-chip {
+  padding: 0.5rem 0.85rem;
+  background: rgba(255, 213, 74, 0.08);
+  border-color: rgba(255, 213, 74, 0.14);
+  color: #fff2bb;
+}
+
+.edit-form {
+  margin-top: 1.35rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.field-span-full {
+  grid-column: 1 / -1;
+}
+
+.edit-actions {
+  margin-top: 1rem;
+}
+
 @keyframes card-rise {
   from {
     opacity: 0;
@@ -376,13 +531,14 @@ input {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .shell {
     padding: 1rem;
   }
 
   .todo-card {
     max-width: none;
+    padding: 1.2rem;
   }
 
   .card-header,
@@ -391,8 +547,21 @@ input {
     align-items: stretch;
   }
 
-  .header-actions,
-  .button-row {
-    justify-content: flex-start;
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-span-full {
+    grid-column: auto;
+  }
+
+  .compact-field {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .card-controls {
+    align-items: end;
   }
 }

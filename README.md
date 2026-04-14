@@ -1,6 +1,6 @@
-# Stage 0 Frontend: Testable Todo Item Card
+# Stage 1 Frontend: Advanced Todo Card
 
-A single-card productivity UI built with React and Vite. The component uses semantic HTML, supports the required `data-testid` hooks, and updates the time remaining every 30 seconds so due-date hints stay accurate against the browser's current time.
+A single-card productivity UI built with React and Vite. Stage 1 extends the original Stage 0 card into a stateful component with editable content, synchronized status controls, collapsible long-form detail, and richer due-date feedback.
 
 ## Live URL
 
@@ -15,14 +15,39 @@ Add your repository URL here after pushing:
 
 - `https://github.com/your-username/your-repository-name`
 
-## Repo Notes
+## What Changed From Stage 0
 
-This repository contains:
+- Added edit mode with labeled fields for title, description, priority, and due date
+- Added save/cancel flows with local state restoration on cancel
+- Replaced passive status display with an interactive status control
+- Synchronized checkbox state and task status so `Done` always maps to a checked card
+- Added a dedicated priority indicator with stronger visual treatment for `High`
+- Added expand/collapse behavior for long descriptions using accessible `aria-expanded` and `aria-controls`
+- Added explicit overdue handling and more granular relative time labels
+- Kept the time display live with a 30-second refresh cadence until the task is marked complete
 
-- A high-fidelity task card with semantic roles and accessible controls
-- Accurate due date formatting like `Due Apr 16, 2026` and relative hints like `Due in 3 days`
-- A real checkbox for task completion
-- Optional bonus test coverage with React Testing Library and Vitest
+## New Design Decisions
+
+- Kept the card state local because the brief still targets a single advanced card rather than a multi-item app
+- Used explicit `status` plus synchronized `completed` state to keep the checkbox, badge, and status control visually aligned
+- Defaulted long descriptions to collapsed so the card remains compact on 320px layouts
+- Preserved all Stage 0 `data-testid` hooks and layered the new Stage 1 hooks on top of the same component structure
+- Used left-border accents, badges, and a small priority dot so state changes remain visible without changing the overall layout
+
+## Accessibility Notes
+
+- Edit form controls use explicit `<label htmlFor="">` associations
+- The status select exposes the accessible name `Task status`
+- The expand/collapse button uses `aria-expanded` and `aria-controls` linked to the collapsible region
+- Relative time uses `aria-live="polite"` so changes can be announced without interrupting the user
+- Keyboard order is preserved across the main interactive controls and edit actions
+- Focus returns to the `Edit` button when edit mode closes
+
+## Known Limitations
+
+- Delete is still a demo action and does not remove the card from the page
+- Focus trapping inside the edit form is not implemented; focus return is implemented instead
+- Live URL and GitHub URL still need your deployment and repository details
 
 ## How to Run Locally
 
@@ -38,21 +63,7 @@ This repository contains:
 4. Output directory: `dist`
 5. Copy the generated deployment URL into the `Live URL` section above
 
-## Decisions Made
-
-- Used React + Vite for a lightweight single-page deliverable that is easy to test and deploy
-- Used semantic elements such as `article`, `h2`, `p`, `time`, `ul`, `li`, `button`, and a real checkbox input
-- Kept the card state local because Stage 0 only needs a polished presentational core UI element
-- Refreshed the relative time every 30 seconds to keep automated checks and visual hints in sync with real time
-- Used a yellow, black, and teal visual system to give the card a stronger identity while keeping contrast high
-
-## Trade-offs
-
-- The `Edit` and `Delete` actions are UI-ready but non-persistent because the brief focuses on the card component itself
-- The demo ships with one sample task instead of a full task list to keep the implementation tightly aligned with the acceptance criteria
-- Live deployment and GitHub remote setup require your own hosting/account credentials, so the codebase is prepared for deployment but the final URLs must be added after publishing
-
 ## Testing
 
 - Run `npm test` to execute the Vitest suite
-- The included test verifies the required test IDs and checks completion-state behavior
+- The test suite covers Stage 0 hooks plus Stage 1 edit flows, status synchronization, collapse accessibility, and time-state behavior
