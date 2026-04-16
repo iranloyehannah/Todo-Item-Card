@@ -395,12 +395,16 @@ function App() {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
+    if (task.completed) {
+      return undefined;
+    }
+
     const timer = window.setInterval(() => {
       setNow(Date.now());
     }, 30000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [task.completed]);
 
   function handleToggleComplete() {
     setTask((current) =>

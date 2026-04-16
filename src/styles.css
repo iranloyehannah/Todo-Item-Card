@@ -437,7 +437,8 @@ select.control-input {
 }
 
 .collapsible-section.is-open {
-  max-height: 24rem;
+  max-height: none;
+  overflow: visible;
   opacity: 1;
 }
 

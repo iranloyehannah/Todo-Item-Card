@@ -130,8 +130,12 @@ describe('Todo card', () => {
   });
 
   it('updates relative time on the interval until the task is done', () => {
+    const setIntervalSpy = vi.spyOn(window, 'setInterval');
+    const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
+
     render(<App />);
 
+    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('test-todo-time-remaining')).toHaveTextContent('Due in 2 days');
 
     act(() => {
@@ -144,11 +148,27 @@ describe('Todo card', () => {
       target: { value: 'Done' },
     });
 
+    expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+
     act(() => {
       vi.advanceTimersByTime(60 * 60 * 1000);
     });
 
     expect(screen.getByTestId('test-todo-time-remaining')).toHaveTextContent('Completed');
     expect(screen.getByTestId('test-todo-overdue-indicator')).toHaveTextContent(/completed/i);
+  });
+
+  it('reveals the full description when expanded', () => {
+    render(<App />);
+
+    const expandToggle = screen.getByTestId('test-todo-expand-toggle');
+    const collapsible = screen.getByTestId('test-todo-collapsible-section');
+
+    expect(collapsible).toHaveClass('is-collapsed');
+
+    fireEvent.click(expandToggle);
+
+    expect(collapsible).toHaveClass('is-open');
   });
 });

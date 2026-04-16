@@ -4,16 +4,14 @@ A single-card productivity UI built with React and Vite. Stage 1 extends the ori
 
 ## Live URL
 
-Add your deployed URL here after publishing:
+Deployment URL still needs to be added after publishing. No live URL is stored in this repository yet.
 
 - Vercel: `https://your-project-name.vercel.app`
 - Netlify: `https://your-project-name.netlify.app`
 
 ## GitHub Repo
 
-Add your repository URL here after pushing:
-
-- `https://github.com/your-username/your-repository-name`
+- `https://github.com/iranloyehannah/Todo-Item-Card`
 
 ## What Changed From Stage 0
 
@@ -47,7 +45,7 @@ Add your repository URL here after pushing:
 
 - Delete is still a demo action and does not remove the card from the page
 - Focus trapping inside the edit form is not implemented; focus return is implemented instead
-- Live URL and GitHub URL still need your deployment and repository details
+- Live URL still needs to be added after deployment
 
 ## How to Run Locally
 
